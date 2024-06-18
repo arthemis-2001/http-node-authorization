@@ -18,21 +18,32 @@
             event.preventDefault();
 
             const formData = new FormData(this);
-            const email = formData.get("email");
-            const password = formData.get("password");
 
             fetch("/login", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email, password }),
+              body: formData,
             })
               .then((response) => response.json())
               .then((data) => {
                 if (data.accessToken) {
                   localStorage.setItem("accessToken", data.accessToken);
-                  window.location.href = "/main";
+
+                  fetch("/main", {
+                    method: "GET",
+                    headers: {
+                      Authorization: `JWT ${data.accessToken}`,
+                    },
+                  })
+                    .then((response) => {
+                      if (response.ok) {
+                        console.log("GET request to /main successful");
+                      } else {
+                        console.error("Failed to fetch data");
+                      }
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
                 } else {
                   let errorMessage = data.message || "An unknown error.";
 

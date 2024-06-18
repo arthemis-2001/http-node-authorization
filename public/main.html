@@ -11,14 +11,6 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <script>
-      window.onload = function () {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
-          window.location.href = "/login";
-        }
-      };
-    </script>
   </head>
   <body>
     <div class="header d-flex flex-column align-items-center">
