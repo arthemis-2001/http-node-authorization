@@ -9,12 +9,14 @@ require("dotenv").config();
 // Serve static files in the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
 //Connect to database
 try {
   mongoose.connect("mongodb://localhost:27017/usersdb");
   console.log("connected to db");
 } catch (error) {
-  handleError(error);
+  console.error(error);
 }
 process.on("unhandledRejection", (error) => {
   console.log("unhandledRejection", error.message);
