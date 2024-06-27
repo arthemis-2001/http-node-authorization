@@ -10,53 +10,6 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <script>
-
-      document.addEventListener("DOMContentLoaded", function () {
-        document
-          .querySelector("register-form")
-          .addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch("/register", {
-              method: "POST",
-              body: formData,
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (response.ok) {
-                  document
-                    .getElementById("registerAlert")
-                    .classList.remove("alert-danger");
-                  document
-                    .getElementById("registerAlert")
-                    .classList.add("alert-success");
-                  document.getElementById("registerAlert").textContent =
-                    errorMessage;
-                  document.getElementById("registerAlert").style.display =
-                    "block";
-                } else {
-                  let errorMessage = data.message || "An unknown error.";
-
-                  document.getElementById("registerAlert").textContent =
-                    errorMessage;
-                  document.getElementById("registerAlert").style.display =
-                    "block";
-                }
-              })
-              .catch((error) => {
-                console.error("Error:", error);
-
-                document.getElementById(
-                  "registerAlert"
-                ).textContent = `Failed to connect: ${error.message}`;
-                document.getElementById("loginAlert").style.display = "block";
-              });
-          });
-      });
-    </script>
   </head>
   <body>
     <div class="container">
@@ -92,5 +45,51 @@
         ></div>
       </form>
     </div>
+    <script>
+      const registerAlert = document.getElementById("registerAlert");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("register-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch("/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fullName: formData.get("fullName"),
+                email: formData.get("email"),
+                password: formData.get("password"),
+              }),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  registerAlert.classList.remove("alert-danger");
+                  registerAlert.classList.add("alert-success");
+                  return response.json();
+                } else {
+                  return response.text().then((text) => {
+                    throw new Error(text || "An unknown error.");
+                  });
+                }
+              })
+              .then((data) => {
+                registerAlert.textContent = data.message;
+                registerAlert.style.display = "block";
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+
+                registerAlert.textContent = `Failed to connect: ${error.message}`;
+                registerAlert.style.display = "block";
+              });
+          });
+      });
+    </script>
   </body>
 </html>

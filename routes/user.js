@@ -1,17 +1,17 @@
 var express = require("express"),
   router = express.Router(),
-  path = require('path'),
+  path = require("path"),
   verifyToken = require("../middleware/authJWT"),
   { signup, signin } = require("../controllers/auth.controller.js");
 
 router.get("/register", function (req, res) {
-  res.sendFile(path.join(__dirname, '../public/register.html'));
+  res.sendFile(path.join(__dirname, "../public/register.html"));
 });
 
 router.post("/register", signup, function (req, res) {});
 
 router.get("/login", function (req, res) {
-  res.sendFile(path.join(__dirname, '../public/login.html'));
+  res.sendFile(path.join(__dirname, "../public/login.html"));
 });
 
 router.post("/login", signin, function (req, res) {});
@@ -22,7 +22,7 @@ router.get("/main", verifyToken, function (req, res) {
       message: "Invalid JWT token",
     });
   } else {
-    res.sendFile(path.join(__dirname, '../public/main.html'));
+    res.sendFile(path.join(__dirname, "../public/main.html"));
   }
 });
 

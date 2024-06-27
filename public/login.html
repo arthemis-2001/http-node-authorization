@@ -10,59 +10,6 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        document
-          .getElementById("login-form")
-          .addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch("/login", {
-              method: "POST",
-              body: formData,
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.accessToken) {
-                  localStorage.setItem("accessToken", data.accessToken);
-
-                  fetch("/main", {
-                    method: "GET",
-                    headers: {
-                      Authorization: `JWT ${data.accessToken}`,
-                    },
-                  })
-                    .then((response) => {
-                      if (response.ok) {
-                        console.log("GET request to /main successful");
-                      } else {
-                        console.error("Failed to fetch data");
-                      }
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                } else {
-                  let errorMessage = data.message || "An unknown error.";
-
-                  document.getElementById("loginAlert").textContent =
-                    errorMessage;
-                  document.getElementById("loginAlert").style.display = "block";
-                }
-              })
-              .catch((error) => {
-                console.error("Error:", error);
-
-                document.getElementById(
-                  "loginAlert"
-                ).textContent = `Failed to connect: ${error.message}`;
-                document.getElementById("loginAlert").style.display = "block";
-              });
-          });
-      });
-    </script>
   </head>
   <body>
     <div class="container">
@@ -89,5 +36,71 @@
         ></div>
       </form>
     </div>
+    <script>
+      const loginAlert = document.getElementById("loginAlert");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("login-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch("/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: formData.get("email"),
+                password: formData.get("password"),
+              }),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  return response.json();
+                } else {
+                  return response.text().then((text) => {
+                    throw new Error(text || "An unknown error.");
+                  });
+                }
+              })
+              .then((data) => {
+                if (data.accessToken) {
+                  console.log(data.accessToken);
+                  
+                  fetch("/main", {
+                    method: "GET",
+                    headers: {
+                      Authorization: `JWT ${data.accessToken}`,
+                    },
+                  })
+                    .then((response) => {
+                      if (response.ok) {
+                        console.log("GET request to /main successful");
+                      } else {
+                        console.error("Failed to fetch data");
+                      }
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                } else {
+                  let errorMessage = data.message || "An unknown error.";
+
+                  loginAlert.textContent = errorMessage;
+                  loginAlert.style.display = "block";
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+
+                loginAlert.textContent = `Failed to connect: ${error.message}`;
+                loginAlert.style.display = "block";
+              });
+          });
+      });
+    </script>
   </body>
 </html>

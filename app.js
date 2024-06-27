@@ -9,8 +9,6 @@ require("dotenv").config();
 // Serve static files in the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-
 //Connect to database
 try {
   mongoose.connect("mongodb://localhost:27017/usersdb");
